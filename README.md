@@ -1,4 +1,5 @@
 # LFI to RCE via phpinfo()
+Research from !(https://insomniasec.com/downloads/publications/LFI%20With%20PHPInfo%20Assistance.pdf)
 
 # Use case
 
