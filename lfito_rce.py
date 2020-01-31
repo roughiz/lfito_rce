@@ -478,7 +478,7 @@ if __name__=="__main__":
     action, rem_args = arg_parser.parse_known_args()
     if not action.action or action.action == "1":
       if action.phpinfo is None:
-        print("\nphpinfolfi_rce.py: error: argument -i/--phpinfo is required")
+        print("\nlfito_rce.py: error: argument -i/--phpinfo is required")
         sys.exit(1)
       action=True  
     elif action.action and action.action == "2":
