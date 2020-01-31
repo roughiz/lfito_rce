@@ -1,6 +1,7 @@
 # LFI to RCE via phpinfo() assistance or via controlled log file 
 
 For more details about exploit via phpinfo(). research from [here](https://insomniasec.com/downloads/publications/LFI%20With%20PHPInfo%20Assistance.pdf)
+
 For more details about exploit via controlled log file, writeup grom [here](https://outpost24.com/blog/from-local-file-inclusion-to-remote-code-execution-part-1)
 
 # Use case
