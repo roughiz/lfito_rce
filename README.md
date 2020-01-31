@@ -112,7 +112,9 @@ Verify your nc listenner 127.0.0.1:9001
 
 ### Nota 
 
-Install the pyfiglet python module like :
+Sometimes you have to use a hight thread value to increase your chances of success !!
+ 
+#### Install the pyfiglet python module like :
 
 ```
 $ sudo pip install pyfiglet
